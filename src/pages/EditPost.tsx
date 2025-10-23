@@ -1,6 +1,4 @@
-
-import React from 'react'; //
-import { useParams, useNavigate } from 'react-router-dom'; //
+import { useParams, useNavigate } from 'react-router-dom';
 import PostForm from '../components/PostForm';
 import { Post } from '../types/Post';
 
@@ -9,30 +7,32 @@ interface EditPostProps {
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
 }
 
-const EditPost: React.FC<EditPostProps> = ({ posts, setPosts }) => {
+const EditPost = ({ posts, setPosts }: EditPostProps) => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate(); //
+  const navigate = useNavigate();
   const postToEdit = posts.find((p) => p.id === id);
 
   if (!postToEdit) {
     return <h2>Không tìm thấy bài viết để chỉnh sửa</h2>;
   }
 
-  const handleUpdate = (updatedPost: Post) => {
+  const handleUpdate = (updatedPostData: Omit<Post, 'id' | 'createdAt'>) => {
+    const updatedPost: Post = {
+      ...updatedPostData,
+      id: postToEdit.id,
+      createdAt: postToEdit.createdAt,
+    };
+
     setPosts((prevPosts) =>
       prevPosts.map((post) => (post.id === updatedPost.id ? updatedPost : post))
     );
     alert('Cập nhật thành công!');
-    navigate(`/posts/${updatedPost.id}`); //
-  };
-
-  const handleSubmit = (data: Omit<Post, 'id' | 'createdAt'> | Post) => {
-    handleUpdate(data as Post);
+    navigate(`/posts/${updatedPost.id}`);
   };
 
   return (
     <PostForm
-      onSubmit={handleSubmit}
+      onSubmit={handleUpdate}
       initialData={postToEdit}
       mode="edit"
     />
